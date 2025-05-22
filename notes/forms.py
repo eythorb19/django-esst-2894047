@@ -1,6 +1,10 @@
 from django import forms
 from .models import Notes
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+
 
 
 class NotesForm(forms.ModelForm):
@@ -21,3 +25,11 @@ class NotesForm(forms.ModelForm):
         if 'Django' not in title:
             raise ValidationError('We only accept notes about Django!')
         return title
+    
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']

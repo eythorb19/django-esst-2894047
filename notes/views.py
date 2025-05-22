@@ -5,9 +5,23 @@ from django.urls import reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+from django.contrib.auth import login
 from .models import Notes
 from .forms import NotesForm
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # Optional: logs in the user after signup
+            return redirect('home')  # Change to your desired redirect target
+    else:
+        form = SignUpForm()
+    return render(request, 'home/signup.html', {'form': form})
 
 
 def add_like_view(request, pk):
@@ -62,3 +76,8 @@ class NotesListView(LoginRequiredMixin, ListView):
 class NotesDetailView(DetailView):
     model = Notes
     context_object_name = "note"
+
+class NotesPublicDetailView(DetailView):
+    model = Notes
+    context_object_name = "note"
+    query = Notes.objects.filter(is_public=True)
